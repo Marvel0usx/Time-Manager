@@ -38,5 +38,29 @@ def check_password (database_name,username,password):
 def create_account (database_name,username,password):
     database = sqlite3.connect (database_name)
     database.execute ("INSERT INTO user_information VALUES ('%s','%s');" % (username,password))
+    database.execute ("CREATE TABLE %s_schedules (date_start CHAR(14) NOT NULL, date_end CHAR(14) NOT NULL, event_level INT NOT NULL, event_name VARCHAR(30) NOT NULL, event_location VARCHAR(30), Note TEXT, PRIMARY KEY (date_start,date_end));" % (username))
+    database.commit ()
+    database.close ()
+
+# Change username
+def change_username (database_name,username,new_username):
+    database = sqlite3.connect (database_name)
+    database.execute ("UPDATE user_information SET username = '%s' WHERE username = '%s';" % (new_username,username))
+    database.execute ("ALTER TABLE %s RENAME TO %s" % (username + "_schedules",new_username + "_schedules"))
+    database.commit ()
+    database.close ()
+
+# Change password
+def change_password (database_name,username,password):
+    database = sqlite3.connect (database_name)
+    database.execute ("UPDATE user_information SET password = '%s' WHERE username = '%s';" % (password,username))
+    database.commit ()
+    database.close ()
+
+# Delete account
+def delete_account (database_name,username):
+    database = sqlite3.connect (database_name)
+    database.execute ("DELETE FROM user_information WHERE username = '%s'" % (username))
+    database.execute ("DROP TABLE %s_schedules" % (username))
     database.commit ()
     database.close ()
